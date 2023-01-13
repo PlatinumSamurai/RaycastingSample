@@ -402,7 +402,7 @@ int main() {
 
 
             while(!isHitted and rayLength < DIST_DEPTH) {
-                rayLength += 0.1;
+                rayLength += 0.75;
                 sf::Vector2f interPoint;
 
                 float testX = player.getPosition().first + rayX * rayLength;
@@ -415,6 +415,7 @@ int main() {
                     if(segmentsInetersect(convex.getPoint(0), sf::Vector2f(testX, testY),
                                           line[0].position, line[1].position, interPoint)) {
                         rayLength = lineLength(convex.getPoint(0), interPoint);
+						isHitted = true;
                     }
 //                    for(const auto &item : blocks) {
 //                        if(item.getGlobalBounds().contains(testX, testY)) {
@@ -427,8 +428,8 @@ int main() {
 //                    }
                 }
 
-                convex.setPoint(i, sf::Vector2f(player.getPosition().first + rayX * rayLength,
-                                                player.getPosition().second + rayY * rayLength));
+                convex.setPoint(i, sf::Vector2f(player.getPosition().first + rayX * rayLength - 11,
+                                                player.getPosition().second + rayY * rayLength - 11));
             }
 
         }
