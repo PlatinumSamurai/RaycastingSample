@@ -271,11 +271,12 @@ int main() {
 
 
     convex.move(sf::Vector2f(12, 12));
-    convex.setFillColor(sf::Color(255, 255, 255, 128));
+//    convex.setFillColor(sf::Color(255, 255, 255, 128));
+    convex.setFillColor(sf::Color::Black);
     convex.setOutlineThickness(1);
     convex.setOutlineColor(sf::Color::Red);
 //    std::cout << convex.getPosition().x << " " << convex.getPosition().y << std::endl;
-    convex.setPointCount(SCREEN_WIDTH / 32 + 1);
+    convex.setPointCount(SCREEN_WIDTH / 16 + 1);
     convex.setPoint(0, player.getPoint().getPosition());
     for(int i = 1; i <= convex.getPointCount() - 1; ++i) {
         float rayAngle = (player.getDirection() * PI / 180 - FOV / 2.0f) + (float(i - 1) / float(convex.getPointCount() - 1)) * FOV;
@@ -395,27 +396,29 @@ int main() {
         for(int i = 1; i <= convex.getPointCount() - 1; ++i) {
             float rayAngle = float(player.getDirection() * PI / 180 - FOV / 2.0f) + (float(i - 1) / float(convex.getPointCount() - 1) * FOV);
             float rayLength = 0;
-            bool isHitted = false;
+//            bool isHitted = false;
             float rayX = sinf(rayAngle);
             float rayY = cosf(rayAngle);
 
 
 
-            while(!isHitted and rayLength < DIST_DEPTH) {
-                rayLength += 0.75;
+//            while(!isHitted and rayLength < DIST_DEPTH) {
+//                rayLength += 0.75;
                 sf::Vector2f interPoint;
 
-                float testX = player.getPosition().first + rayX * rayLength;
-                float testY = player.getPosition().second + rayY * rayLength;
+                float testX = player.getPosition().first + rayX * DIST_DEPTH;
+                float testY = player.getPosition().second + rayY * DIST_DEPTH;
 
-                if(testX < 0 or testX > MAP_WIDTH or testY < 0 or testY > MAP_HEIGHT) {
-                    isHitted = true;
-                    rayLength = DIST_DEPTH;
-                } else {
+//                if(testX < 0 or testX > MAP_WIDTH or testY < 0 or testY > MAP_HEIGHT) {
+//                    isHitted = true;
+//                    rayLength = DIST_DEPTH;
+//                } else {
                     if(segmentsInetersect(convex.getPoint(0), sf::Vector2f(testX, testY),
                                           line[0].position, line[1].position, interPoint)) {
                         rayLength = lineLength(convex.getPoint(0), interPoint);
-						isHitted = true;
+//						isHitted = true;
+                    } else {
+                        rayLength = DIST_DEPTH;
                     }
 //                    for(const auto &item : blocks) {
 //                        if(item.getGlobalBounds().contains(testX, testY)) {
@@ -426,11 +429,11 @@ int main() {
 //                    if(circle.getGlobalBounds().contains(testX, testY)) {
 //                        isHitted = true;
 //                    }
-                }
+//                }
 
                 convex.setPoint(i, sf::Vector2f(player.getPosition().first + rayX * rayLength - 11,
                                                 player.getPosition().second + rayY * rayLength - 11));
-            }
+//            }
 
         }
 
