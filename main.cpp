@@ -141,44 +141,18 @@ sf::RectangleShape Player::getDirLine() const {
     return dirLine;
 }
 
-//sf::CircleShape Player::getFOVCircle() const {
-//    return circleFOV;
-//}
 
-
-//int generateBounds(std::vector<sf::RectangleShape> &walls) {
-//    for(int i = 0; i < 10; ++i) {
-//        walls.emplace_back(sf::Vector2f(BLOCK_WIDTH, BLOCK_HEIGHT));
+int generateBounds(std::vector<sf::VertexArray> &walls) {
+    sf::VertexArray line(sf::Lines, 2);
+    for(int i = 0; i < 10; ++i) {
+        line[0] = sf::Vector2f(i * BLOCK_WIDTH, BLOCK_HEIGHT);
+        line[0].color = sf::Color::Red;
+        line[1] = sf::Vector2f((i + 1) * BLOCK_WIDTH, BLOCK_HEIGHT);
+        line[1].color = sf::Color::Red;
+        walls.push_back(line);
 //        walls.back().setPosition(i * BLOCK_WIDTH, 0);
 //        walls.back().setFillColor(sf::Color::Red);
-//    }
-//    for(int i = 0; i < 10; ++i) {
-//        walls.emplace_back(sf::Vector2f(BLOCK_WIDTH, BLOCK_HEIGHT));
-//        walls.back().setPosition(i * BLOCK_WIDTH + BLOCK_HEIGHT, BLOCK_WIDTH * 10);
-//        walls.back().setFillColor(sf::Color::Yellow);
-//    }
-//    for(int i = 0; i < 10; ++i) {
-//        walls.emplace_back(sf::Vector2f(BLOCK_WIDTH, BLOCK_HEIGHT));
-//        walls.back().rotate(90);
-//        walls.back().setPosition(BLOCK_HEIGHT, i * BLOCK_WIDTH + BLOCK_HEIGHT);
-//        walls.back().setFillColor(sf::Color::Green);
-//    }
-//    for(int i = 0; i < 10; ++i) {
-//        walls.emplace_back(sf::Vector2f(BLOCK_WIDTH, BLOCK_HEIGHT));
-//        walls.back().rotate(90);
-//        walls.back().setPosition(BLOCK_WIDTH * 10 + BLOCK_HEIGHT, i * BLOCK_WIDTH);
-//        walls.back().setFillColor(sf::Color::Magenta);
-//    }
-//
-//    return 0;
-//}
 
-int generateBounds(std::vector<sf::Vertex [2]> &walls) {
-    for(int i = 0; i < 10; ++i) {
-//        sf::Vertex line[2] = {
-//                sf::Vertex(sf::Vector2f(i * BLOCK_WIDTH, 0)),
-//                sf::Vertex(sf::Vector2f((i + 1) * BLOCK_WIDTH, 0))};
-//        walls.push_back(line);
     }
 //    for(int i = 0; i < 10; ++i) {
 //        walls.emplace_back(sf::Vector2f(BLOCK_WIDTH, BLOCK_HEIGHT));
@@ -200,6 +174,7 @@ int generateBounds(std::vector<sf::Vertex [2]> &walls) {
 
     return 0;
 }
+
 
 sf::Vector2f pointIntersection(const sf::Vector2f &a, const sf::Vector2f &b, const sf::Vector2f &c, const sf::Vector2f &d) {
     float s = ((a.x - c.x) * (d.y - c.y) - (d.x - c.x) * (a.y - c.y)) / ((d.x - c.x) * (b.y - a.y) - (b.x - a.x) * (d.y - c.y));
@@ -257,43 +232,32 @@ float lineLength(const sf::Vector2f &p1, const sf::Vector2f &p2) {
 int main() {
     sf::RenderWindow window(sf::VideoMode(SCREEN_WIDTH, SCREEN_HEIGHT), "Game Of Life");
     window.setFramerateLimit(60);
-    Player player(500, 500, 90);
+    Player player(500, 200, 180);
     player.update();
-    std::vector<sf::Vertex [2]> walls;
-//    std::vector<sf::RectangleShape> blocks;
-//    std::vector<sf::RectangleShape> toDraw;
+    std::vector<sf::VertexArray> walls;
     sf::Clock timePoint1;
     sf::ConvexShape convex;
     sf::Vertex line[2] = {
             sf::Vertex(sf::Vector2f(3 * BLOCK_WIDTH, 5 * BLOCK_HEIGHT)),
             sf::Vertex(sf::Vector2f((4) * BLOCK_WIDTH, 5 * BLOCK_HEIGHT))};
-//    walls.push_back(line);
 
 
     convex.move(sf::Vector2f(12, 12));
-//    convex.setFillColor(sf::Color(255, 255, 255, 128));
-    convex.setFillColor(sf::Color::Black);
+    convex.setFillColor(sf::Color(255, 255, 255, 0));
     convex.setOutlineThickness(1);
     convex.setOutlineColor(sf::Color::Red);
-//    std::cout << convex.getPosition().x << " " << convex.getPosition().y << std::endl;
     convex.setPointCount(SCREEN_WIDTH / 16 + 1);
     convex.setPoint(0, player.getPoint().getPosition());
     for(int i = 1; i <= convex.getPointCount() - 1; ++i) {
         float rayAngle = (player.getDirection() * PI / 180 - FOV / 2.0f) + (float(i - 1) / float(convex.getPointCount() - 1)) * FOV;
-//        rayAngle = rayAngle * PI / 180;
         float rayX = sinf(rayAngle);
         float rayY = cosf(rayAngle);
 
-//        std::cout << "RayX: " << rayX << "  RayY: " << rayY << std::endl;
         convex.setPoint(i, sf::Vector2f(player.getPosition().first + rayX * DIST_DEPTH,
                                         player.getPosition().second + rayY * DIST_DEPTH));
     }
 
-//    generateBounds(walls);
-//
-//    blocks.emplace_back(sf::RectangleShape(sf::Vector2f(BLOCK_WIDTH, BLOCK_WIDTH)));
-//    blocks.back().setPosition(400, 400);
-//    blocks.back().setFillColor(sf::Color::Magenta);
+    generateBounds(walls);
 
     sf::CircleShape circle;
     circle.setRadius(100);
@@ -358,7 +322,7 @@ int main() {
             }
         }
 
-        if(sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::W)) {
             std::cout << "W button has been pressed!" << std::endl;
             player.movePosition(sinf(player.getDirection() * PI / 180) * 0.25f * timeElapsed.asMilliseconds(),
                                 cosf(player.getDirection() * PI / 180) * 0.25f * timeElapsed.asMilliseconds());
@@ -370,7 +334,7 @@ int main() {
 //            }
         }
 
-        if(sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
             std::cout << "S button has been pressed!" << std::endl;
             player.movePosition(-sinf(player.getDirection() * PI / 180) * 0.25f * timeElapsed.asMilliseconds(),
                                 -cosf(player.getDirection() * PI / 180) * 0.25f * timeElapsed.asMilliseconds());
@@ -382,125 +346,71 @@ int main() {
 //            }
         }
 
-        if(sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
             std::cout << "A button has been pressed!" << std::endl;
             player.moveDirection(1.5);
         }
 
-        if(sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
             std::cout << "D button has been pressed!" << std::endl;
             player.moveDirection(-1.5);
         }
 
+        window.clear(sf::Color::Black);
+
         convex.setPoint(0, player.getPoint().getPosition());
-        for(int i = 1; i <= convex.getPointCount() - 1; ++i) {
-            float rayAngle = float(player.getDirection() * PI / 180 - FOV / 2.0f) + (float(i - 1) / float(convex.getPointCount() - 1) * FOV);
+        for (int i = 1; i <= convex.getPointCount() - 1; ++i) {
+            float rayAngle = float(player.getDirection() * PI / 180 - FOV / 2.0f) +
+                             (float(i - 1) / float(convex.getPointCount() - 1) * FOV);
             float rayLength = 0;
-//            bool isHitted = false;
             float rayX = sinf(rayAngle);
             float rayY = cosf(rayAngle);
 
 
+            sf::Vector2f interPoint;
 
-//            while(!isHitted and rayLength < DIST_DEPTH) {
-//                rayLength += 0.75;
-                sf::Vector2f interPoint;
+            float testX = player.getPosition().first + rayX * DIST_DEPTH;
+            float testY = player.getPosition().second + rayY * DIST_DEPTH;
 
-                float testX = player.getPosition().first + rayX * DIST_DEPTH;
-                float testY = player.getPosition().second + rayY * DIST_DEPTH;
+            for (auto &item : walls) {
+                if (segmentsInetersect(convex.getPoint(0), sf::Vector2f(testX, testY),
+                                       item[0].position, item[1].position, interPoint)) {
+                    rayLength = lineLength(convex.getPoint(0), interPoint);
+                    break;
+                } else {
+                    rayLength = DIST_DEPTH;
+                }
+            }
 
-//                if(testX < 0 or testX > MAP_WIDTH or testY < 0 or testY > MAP_HEIGHT) {
-//                    isHitted = true;
-//                    rayLength = DIST_DEPTH;
-//                } else {
-                    if(segmentsInetersect(convex.getPoint(0), sf::Vector2f(testX, testY),
-                                          line[0].position, line[1].position, interPoint)) {
-                        rayLength = lineLength(convex.getPoint(0), interPoint);
-//						isHitted = true;
-                    } else {
-                        rayLength = DIST_DEPTH;
-                    }
-//                    for(const auto &item : blocks) {
-//                        if(item.getGlobalBounds().contains(testX, testY)) {
-//                            isHitted = true;
-//                            break;
-//                        }
-//                    }
-//                    if(circle.getGlobalBounds().contains(testX, testY)) {
-//                        isHitted = true;
-//                    }
-//                }
 
-                convex.setPoint(i, sf::Vector2f(player.getPosition().first + rayX * rayLength - 11,
-                                                player.getPosition().second + rayY * rayLength - 11));
-//            }
+            convex.setPoint(i, sf::Vector2f(player.getPosition().first + rayX * rayLength - 11,
+                                            player.getPosition().second + rayY * rayLength - 11));
 
+            int ceil = SCREEN_HEIGHT / 2 - SCREEN_HEIGHT / rayLength;
+            int floor = SCREEN_HEIGHT - ceil;
+
+            sf::RectangleShape rect(sf::Vector2f(20, floor - ceil));
+            sf::Color color = sf::Color::Magenta;
+            sf::Color shade = sf::Color(15, 15, 15);
+
+
+
+            float coef = DIST_DEPTH - rayLength;
+            rect.setFillColor(sf::Color(coef, coef , 0));
+
+            for (int y = 0; y < SCREEN_HEIGHT; ++y) {
+                if (y == ceil) {
+                    rect.setPosition(i * SCREEN_WIDTH / (convex.getPointCount() - 1), y);
+                    window.draw(rect);
+                }
+            }
         }
 
-//        toDraw.clear();
-//        for(int x = 0; x < SCREEN_WIDTH; ++x) {
-//            float rayAngle = float(player.getDirection() - FOV / 2.0f) + (float(x) / SCREEN_WIDTH * FOV);
-//            float rayLength = 0;
-//            bool isHitted = false;
-//            float rayX = sinf(rayAngle);
-//            float rayY = cosf(rayAngle);
-//
-//
-//            while(!isHitted and rayLength < DIST_DEPTH) {
-//                rayLength += 0.25;
-//
-//                float testX = player.getPosition().first + rayX * rayLength;
-//                float testY = player.getPosition().second + rayY * rayLength;
-//
-//                if(testX < 0 or testX > MAP_WIDTH or testY < 0 or testY > MAP_HEIGHT) {
-//                    isHitted = true;
-//                    rayLength = DIST_DEPTH;
-//                } else {
-//                    for(const auto &item : blocks) {
-//                        if(item.getGlobalBounds().contains(testX, testY)) {
-//                            isHitted = true;
-//                            break;
-//                        }
-//                    }
-//                }
-//            }
-//
-//            int ceil = SCREEN_HEIGHT / 2 - SCREEN_HEIGHT / rayLength;
-//            int floor = SCREEN_HEIGHT - ceil;
-//            sf::RectangleShape rect(sf::Vector2f(20, floor - ceil));
-//
-//            sf::Color color = sf::Color::Magenta;
-//            sf::Color shade = sf::Color(15, 15, 15);
-//
-//
-//            if(rayLength < DIST_DEPTH / 3.0f) {
-//                rect.setFillColor(color);
-//            } else if(rayLength < DIST_DEPTH / 2.0f) {
-//                rect.setFillColor(color - shade);
-//            } else if(rayLength < DIST_DEPTH / 1.5f) {
-//                rect.setFillColor(color - shade - shade);
-//            } else if(rayLength < DIST_DEPTH) {
-//                rect.setFillColor(color - shade - shade - shade);
-//            } else {
-//                rect.setFillColor(shade);
-//            }
-//
-//            for(int y = 0; y < SCREEN_HEIGHT; ++y) {
-//                if(y == ceil) {
-//                    rect.setPosition(x, y);
-////                    window.draw(rect);
-//                    toDraw.push_back(rect);
-////                    break;
-//                }
-//            }
-//        }
-
-        window.clear(sf::Color::Black);
-//        for(auto &item : walls) {
-//            window.draw(item, 2, sf::Lines);
-//        }
-        window.draw(line, 2, sf::Lines);
-        window.draw(circle);
+        for(const auto &item : walls) {
+            window.draw(item);
+        }
+//        window.draw(line, 2, sf::Lines);
+//        window.draw(circle);
         window.draw(convex);
         window.draw(player.getPoint());
         window.draw(player.getDirLine());
